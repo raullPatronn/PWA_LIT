@@ -1,43 +1,55 @@
-import {LitElement, html} from 'lit';
+import {LitElement, html, css} from 'lit';
 
 export class MyElement extends LitElement {
   static properties = {
-    forward: {},
-    backward: {},
+    _showMessage: {state: true},
   };
+  static styles = css`
+    :host {
+      display: block;
+    }
+    #message {
+      position: fixed;
+      background-color: cornflowerblue;
+      color: white;
+      padding: 10px;
+    }
+  `;
 
   constructor() {
     super();
-    this.forward = '';
-    this.backward = '';
+    this._showMessage = false;
   }
 
-  willUpdate(changedProperties) {
-    if (changedProperties.has('forward')) {
-      this.backward = this.forward.split('').reverse().join('');
-    }
-
-    if (changedProperties.has('backward')) {
-      this.forward = this.backward.split('').reverse().join('');
-    }
-  }
-
-  onInput(e) {
-    const inputEl = e.target;
-    if (inputEl.id === 'forward') {
-      this.forward = inputEl.value;
-    } else {
-      this.backward = inputEl.value;
-    }
+  get _message() {
+    return this.renderRoot?.querySelector('#message') ?? null;
   }
 
   render() {
     return html`
-      <label>Forward: <input id="forward" @input=${this.onInput} .value=${this.forward}></label>
-      <label>Backward: <input id="backward" @input=${this.onInput} .value=${this.backward}></label>
-      <div>Forward text: ${this.forward}</div>
-      <div>Backward text: ${this.backward}</div>
+      <button @click=${() =>
+        (this._showMessage = !this._showMessage)}>Click me</button>
+      <div id="message" ?hidden=${!this._showMessage}>
+        TADA
+      </div>
     `;
+  }
+
+  updated(changedProperties) {
+    if (changedProperties.has('_showMessage')) {
+      const final = this._message.getBoundingClientRect().width;
+      const starting = 0 - final;
+      this._message.animate(
+        [
+          {transform: `translateX(${starting}px)`},
+          {transform: `translateX(0)`},
+        ],
+        {
+          duration: 500,
+          easing: 'ease-out',
+        }
+      );
+    }
   }
 }
 customElements.define('my-element', MyElement);

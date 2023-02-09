@@ -1,47 +1,55 @@
-import {LitElement, html} from 'lit';
+import {html, css, LitElement} from 'lit';
+import {range} from 'lit/directives/range.js';
+import {map} from 'lit/directives/map.js';
 
 class MyElement extends LitElement {
-  static properties = {
-    friends: {state: true},
-    pets: {state: true},
-    includePets: {state: true},
-  };
+  static styles = css`
+    /* playground-fold */
+    :host {
+      display: block;
+      width: 400px;
+      height: 400px;
+    }
+    #board {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      grid-template-rows: repeat(8, 1fr);
+      border: 2px solid #404040;
+      box-sizing: border-box;
+      height: 100%;
+    }
+    #board > div {
+      padding: 2px;
+    }
+    .black {
+      color: #ddd;
+      background: black;
+    }
+    .white {
+      color: gray;
+      background: white;
+    }
+    /* playground-fold-end */
 
-  constructor() {
-    super();
-    this.friends = ['Harry', 'Ron', 'Hermione'];
-    this.pets = [
-      {name: 'Hedwig', species: 'Owl'},
-      {name: 'Scabbers', species: 'Rat'},
-      {name: 'Crookshanks', species: 'Cat'},
-    ];
-    this.includePets = true;
-  }
+  `;
 
   render() {
-    const listItems = [];
-    this.friends.forEach((friend) => {
-      listItems.push(html`<li>${friend}</li>`);
-    });
-    if (this.includePets) {
-      this.pets.forEach((pet) => {
-        listItems.push(html`<li>${pet.name} (${pet.species})</li>`);
-      });
-    }
-
     return html`
-      <button @click=${() => this._togglePetVisibility()}>
-        ${this.includePets ? 'Hide' : 'Show'} pets
-      </button>
-      <p>My magical friends</p>
-      <ul>
-        ${listItems}
-      </ul>
+      <p>Let's play a game!</p>
+      <div id="board">
+        ${map(range(8), (row) =>
+          map(
+            range(8),
+            (col) => html`
+          <div class="${getColor(row, col)}">${getLabel(row, col)}</div>
+        `
+          )
+        )}
+      </div>
     `;
-  }
-
-  _togglePetVisibility() {
-    this.includePets = !this.includePets;
   }
 }
 customElements.define('my-element', MyElement);
+
+const getColor = (row, col) => ((row + col) % 2 ? 'white' : 'black');
+const getLabel = (row, col) => `${String.fromCharCode(65 + col)}${8 - row}`;

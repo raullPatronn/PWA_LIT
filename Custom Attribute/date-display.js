@@ -12,6 +12,12 @@ export class DateDisplay extends LitElement {
     this.dateStr = '';
   }
 
+  willUpdate(changed) {
+    if (changed.has('dateStr') && this.dateStr) {
+      this.date = new Date(this.dateStr);
+    }
+  }
+
   render() {
     const locale = 'en-US';
     const options = {

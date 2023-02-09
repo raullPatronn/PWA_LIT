@@ -1,60 +1,42 @@
-import {LitElement, html, css} from 'lit';
-import {classMap} from 'lit/directives/class-map.js';
-import {animate} from '@lit-labs/motion';
+import {LitElement, html} from 'lit';
 
 export class MyElement extends LitElement {
   static properties = {
-    big: {type: Boolean},
-    duration: {type: Number},
-    _renderCount: {state: true},
+    forward: {},
+    backward: {},
   };
-
-  static styles = css`
-    .bar {
-      background: red;
-      height: 2em;
-      width: 10vw;
-    }
-
-    .big {
-      width: 50vw;
-    }
-  `;
 
   constructor() {
     super();
-    this.big = false;
-    this.duration = 500;
-    this._renderCount = 0;
+    this.forward = '';
+    this.backward = '';
   }
 
-  setDuration(e) {
-    const v = e.target.value;
-    this.duration = Number.parseInt(v);
+  willUpdate(changedProperties) {
+    if (changedProperties.has('forward')) {
+      this.backward = this.forward.split('').reverse().join('');
+    }
+
+    if (changedProperties.has('backward')) {
+      this.forward = this.backward.split('').reverse().join('');
+    }
   }
 
-  shouldUpdate(changedProperties) {
-    return !(changedProperties.size === 1 && changedProperties.has('duration'));
+  onInput(e) {
+    const inputEl = e.target;
+    if (inputEl.id === 'forward') {
+      this.forward = inputEl.value;
+    } else {
+      this.backward = inputEl.value;
+    }
   }
 
   render() {
-    this._renderCount++;
-    const keyframeOptions = {duration: this.duration};
-
     return html`
-      <p>
-        <button @click=${() => (this.big = !this.big)}>Animate</button>
-      </p>
-      <p>
-        <label>Speed <select @change=${this.setDuration}>
-          <option value="250" selected>Fast</option>
-          <option value="1500">Slow</option>
-        </select></label>
-        Render count: ${this._renderCount}
-      </p>
-      <p class="bar ${classMap({big: this.big})}" ${animate({
-      keyframeOptions,
-    })}></p>
+      <label>Forward: <input id="forward" @input=${this.onInput} .value=${this.forward}></label>
+      <label>Backward: <input id="backward" @input=${this.onInput} .value=${this.backward}></label>
+      <div>Forward text: ${this.forward}</div>
+      <div>Backward text: ${this.backward}</div>
     `;
   }
 }

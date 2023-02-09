@@ -28,9 +28,22 @@ export class MotionCarousel extends LitElement {
     }
     return html`
       <div class="fit">
-        <slot></slot>
+        <slot name="selected"></slot>
       </div>
     `;
+  }
+
+  previous = 0;
+  updated(changedProperties) {
+    if (changedProperties.has('selected') && this.hasValidSelected()) {
+      this.updateSlots();
+      this.previous = this.selected;
+    }
+  }
+
+  updateSlots() {
+    this.children[this.previous]?.removeAttribute('slot');
+    this.children[this.selected]?.setAttribute('slot', 'selected');
   }
 }
 customElements.define('motion-carousel', MotionCarousel);

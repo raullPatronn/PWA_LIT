@@ -1,21 +1,14 @@
 import {LitElement, html} from 'lit';
+import {dateConverter} from './date-converter.js';
 
 export class DateDisplay extends LitElement {
   static properties = {
-    date: {attribute: false},
-    dateStr: {type: String, attribute: 'date-str'},
+    date: {converter: dateConverter(navigator.language), reflect: true},
   };
 
   constructor() {
     super();
     this.date = new Date();
-    this.dateStr = '';
-  }
-
-  willUpdate(changed) {
-    if (changed.has('dateStr') && this.dateStr) {
-      this.date = new Date(this.dateStr);
-    }
   }
 
   render() {
